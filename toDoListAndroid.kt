@@ -1,28 +1,74 @@
+package com.example.todolist
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.example.todolist.ui.theme.TodolistTheme
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            TodolistTheme {
+                TodoApp()
+            }
+        }
+    }
+}
+
 @Composable
-fun TodoListApp() {
+fun TodoApp() {
     var tasks by remember { mutableStateOf(listOf<String>()) }
-    var newTask by remember { mutableStateOf("") }
+    var text by remember { mutableStateOf(TextFieldValue("")) }
 
     Column(modifier = Modifier.padding(16.dp)) {
-        TextField(
-            value = newTask,
-            onValueChange = { newTask = it },
-            label = { Text("Enter a task") }
+        BasicTextField(
+            value = text,
+            onValueChange = { text = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    if (text.text.isNotBlank()) {
+                        tasks = tasks + text.text
+                        text = TextFieldValue("")
+                    }
+                }
+            )
         )
-
-        Button(onClick = {
-            if (newTask.isNotEmpty()) {
-                tasks = tasks + newTask
-                newTask = ""
-            }
-        }) {
+        Button(
+            onClick = {
+                if (text.text.isNotBlank()) {
+                    tasks = tasks + text.text
+                    text = TextFieldValue("")
+                }
+            },
+            modifier = Modifier.padding(vertical = 8.dp)
+        ) {
             Text("Add Task")
         }
-
-        LazyColumn {
-            items(tasks) { task ->
-                Text(task, modifier = Modifier.padding(8.dp))
+        Column {
+            tasks.forEach { task ->
+                Text(text = task, modifier = Modifier.padding(4.dp))
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TodoAppPreview() {
+    TodolistTheme {
+        TodoApp()
     }
 }
