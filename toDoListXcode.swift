@@ -1,32 +1,41 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var tasks: [String] = []
-    @State private var newTask = ""
+    @State private var taskText = ""
+    @State private var tasks: [(String, Bool)] = []
 
     var body: some View {
         VStack {
-            TextField("Enter a task", text: $newTask)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding()
+            HStack {
+                TextField("Enter task...", text: $taskText)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding()
 
-            Button("Add Task") {
-                if !newTask.isEmpty {
-                    tasks.append(newTask)
-                    newTask = ""
+                Button(action: {
+                    if !taskText.isEmpty {
+                        tasks.append((taskText, false))
+                        taskText = ""
+                    }
+                }) {
+                    Text("Add")
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
                 }
             }
-            .padding()
-
             List {
-                ForEach(tasks, id: \.self) { task in
-                    Text(task)
-                }
-                .onDelete { indexSet in
-                    tasks.remove(atOffsets: indexSet)
+                ForEach(tasks.indices, id: \.self) { index in
+                    HStack {
+                        Text(tasks[index].0)
+                        Spacer()
+                        Toggle("", isOn: $tasks[index].1)
+                            .labelsHidden()
+                    }
                 }
             }
         }
+        .padding()
     }
 }
 
